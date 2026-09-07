@@ -1,0 +1,37 @@
+services:
+  helm:
+    build:
+      context: .
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: helm-dev:jazzy
+    container_name: helm
+    hostname: helm
+    network_mode: host
+    ipc: host
+    stdin_open: true
+    tty: true
+    environment:
+      DISPLAY: ${DISPLAY}
+      ROS_DOMAIN_ID: "7"
+      RCUTILS_COLORIZED_OUTPUT: "1"
+      XDG_RUNTIME_DIR: /tmp/runtime-dev
+      __NV_PRIME_RENDER_OFFLOAD: "1"
+      __GLX_VENDOR_LIBRARY_NAME: "nvidia"
+    volumes:
+      - ./ws:/ws
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - gz-cache:/home/dev/.gz
+      - ccache:/home/dev/.cache/ccache
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  gz-cache:
+  ccache:
