@@ -291,3 +291,53 @@ Per the [VRX 2023 Wiki](https://github.com/osrf/vrx/wiki/vrx_2023-task_tutorials
 I think these make a nice set of goals to individually aim for and solve, mitigating scope.
 
 Now to work out what I want the scope of this project to be.
+
+## Scope
+
+There's a lot of directions I could take here.
+
+I'm going to develop it in modular form, so I can iterate on it later etc.
+
+### v0.1 - Control stack on VRX
+
+* Localisation: GNSS + IMU fusion via `robot_localization`.
+* Guidance: line-of-sight, producing heading/speed setpoints.
+* Control: PID heading and speed tracking.
+* Allocation: force/moment to left/right thrust, with saturation and rate limits.
+* Mission: executive holding the current objective (waypoints, stationkeeping), exposed as ROS 2 actions.
+* Interfaces: message definitions; thruster hardware abstraction with a VRX backend.
+* Infrastructure: Docker dev container, CI running `colcon test`.
+* Benchmarks: VRX stationkeeping and wayfinding tasks, scored.
+
+### v0.2 — Model-based control
+
+* System identification of the WAM-V 3-DOF model against VRX hydrodynamics.
+* Control: NMPC via Acados (`acados_vendor_ros2`), replacing guidance + PID behind the same interface.
+* Re-run benchmarks; quantify the delta.
+
+### Later
+
+* Hand-rolled EKF replacing `robot_localization`.
+* Perception (LiDAR/camera), obstacle avoidance as MPC constraints.
+* COLREGs behaviours, multi-vessel encounters.
+* Real thruster backend (PWM/CAN).
+
+## Development
+
+### v0.1 Plan
+
+* Stand-up local environment.
+* Build VRX and verify runs in Gazebo.
+
+Packages:
+
+* `helm_msgs`
+* `helm_localisation`
+* `helm_guidance`
+* `helm_control`
+* `helm_allocation`
+* `helm_hardware`
+* `helm_mission`
+* `helm_bringup`
+
+And a `ThrusterInterface` (VRX backend). This could theoretically be replaced by something real in the future.
