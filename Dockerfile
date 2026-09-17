@@ -15,9 +15,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-colcon-common-extensions python3-rosdep python3-vcstool \
     ros-jazzy-ros-gz \
     ros-jazzy-robot-localization \
-    mesa-utils vim less iputils-ping \
-    nano \
+    mesa-utils vim less iputils-ping nano \
     ros-jazzy-rqt ros-jazzy-rqt-common-plugins \
+    ros-jazzy-tf2-tools \
     # Additional vrx reqs
     python3-sdformat14 ros-jazzy-xacro ros-jazzy-ros-gz-interfaces \
     && rm -rf /var/lib/apt/lists/*
