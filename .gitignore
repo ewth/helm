@@ -6,6 +6,8 @@ ws/vrx_ws/**
 log/
 install/
 
+.vscode/
+
 # ROS GitHub template
 devel/
 logs/
