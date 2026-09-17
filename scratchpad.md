@@ -366,3 +366,96 @@ WAMV Thrusters:
         * Pos currently unused; look into later.
     * `ros2 run helm_hardware vrx_thruster_node`
     * `ros2 topic pub /thrust_command helm_msgs/msg/ThrustCommand "{left: 300.0, right: -300.0}" -r 10`
+    * Works well enough for now.
+
+Localisation:
+
+* Using `robot_localization` for now.
+* Having a squiz at the topics for relevant stuff: `ros2 topic list | grep -E 'gnss|gps|imu|pose'`
+    * `/wamv/pose`
+    * `/wamv/pose_static`
+    * `/wamv/sensors/gps/gps/fix`
+    * `/wamv/sensors/imu/imu/data`
+* `ros2 topic echo --once /wamv/sensors/imu/imu/data`:
+
+```yaml
+header:
+  stamp:
+    sec: 3145
+    nanosec: 580000000
+  frame_id: wamv/wamv/imu_wamv_link/imu_wamv_sensor
+orientation:
+  x: 0.00022668219081110075
+  y: 0.005029954415099406
+  z: -0.7931858312613371
+  w: 0.6089588535032785
+orientation_covariance:
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+angular_velocity:
+  x: -0.02125
+  y: -0.0005
+  z: -0.67
+angular_velocity_covariance:
+- 8.099999831756577e-05
+- 0.0
+- 0.0
+- 0.0
+- 8.099999831756577e-05
+- 0.0
+- 0.0
+- 0.0
+- 8.099999831756577e-05
+linear_acceleration:
+  x: -0.035
+  y: -0.08
+  z: 9.905
+linear_acceleration_covariance:
+- 0.00044100001105107367
+- 0.0
+- 0.0
+- 0.0
+- 0.00044100001105107367
+- 0.0
+- 0.0
+- 0.0
+- 0.00044100001105107367
+```
+
+* `ros2 topic echo --once /wamv/sensors/gps/gps/fix`:
+
+```yaml
+header:
+  stamp:
+    sec: 3223
+    nanosec: 652000000
+  frame_id: wamv/wamv/gps_wamv_link/navsat
+status:
+  status: 0
+  service: 0
+latitude: -33.722444715429596
+longitude: 150.6736713061667
+altitude: 1.268996267579496
+position_covariance:
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+- 0.0
+position_covariance_type: 0
+```
+
+* GPS is published at about 19 Hz per `ros2 topic hz /wamv/sensors/gps/gps/fix`. More than enough.
+* Installing `ros-jazzy-tf2-tools`; adding to base image.
+* `ros2 run tf2_tools view_frames`. Quick squiz of the frames.
