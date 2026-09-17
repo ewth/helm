@@ -359,3 +359,10 @@ WAMV Thrusters:
         * Success!
     * Writing VRX Thruster
     * Actually hold up. Better commit now.
+    * NOW writing VRX Thruster.
+        * Intellisense is having a fit. Might be time to VS Code into the container.
+* VRX Thruster Node
+    * Pubs to WAMV's thruster topics
+        * Pos currently unused; look into later.
+    * `ros2 run helm_hardware vrx_thruster_node`
+    * `ros2 topic pub /thrust_command helm_msgs/msg/ThrustCommand "{left: 300.0, right: -300.0}" -r 10`
