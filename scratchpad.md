@@ -341,3 +341,21 @@ Packages:
 * `helm_bringup`
 
 And a `ThrusterInterface` (VRX backend). This could theoretically be replaced by something real in the future.
+
+## Dev Notes
+
+* Environment stood up.
+* `vrx_gz` built via `vrx_ws/build.sh`
+* Runs in Gazebo via `vrx_ws/launch.sh`
+* Package skeletons created - `skeleton.sh`
+* Basic messages: `Setpoint.msg`, `ThrustCommand.msg`
+* Basic actions: `FollowWaypoints.action`, `HoldStation.action`
+
+WAMV Thrusters:
+
+* Topics: `/wamv/thrusters/{left,right}/{pos,thrust}`
+    * `data:float64`
+    * Test: `ros2 topic pub /wamv/thrusters/left/thrust std_msgs/msg/Float64 "{data: 300.0}" -r 10`
+        * Success!
+    * Writing VRX Thruster
+    * Actually hold up. Better commit now.

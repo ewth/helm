@@ -1,0 +1,6 @@
+# Placeholder
+geometry_msgs/PoseStamped station
+---
+bool success
+---
+float64 position_error

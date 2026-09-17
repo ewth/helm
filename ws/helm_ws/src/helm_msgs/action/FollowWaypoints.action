@@ -1,0 +1,6 @@
+# Placeholder
+geometry_msgs/PoseStamped[] waypoints
+---
+bool success
+---
+uint32 current_waypoint
