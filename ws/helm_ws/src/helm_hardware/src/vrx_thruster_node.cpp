@@ -41,8 +41,8 @@ private:
     void publish(double left, double right)
     {
         std_msgs::msg::Float64 l, r;
-        l.data = std::clamp(left, -max_thrust_, max_thrust_);
-        r.data = std::clamp(right, -max_thrust_, max_thrust_);
+        l.data = std::clamp(left, min_thrust_, max_thrust_);
+        r.data = std::clamp(right, min_thrust_, max_thrust_);
         if (now() - last_output_ > timeout_)
         {
             std::cout << "L: " << l.data << "; R: " << r.data << std::endl;
@@ -53,6 +53,7 @@ private:
     }
 
     double max_thrust_{};
+    double min_thrust_{};
     rclcpp::Duration timeout_{0, 0};
     rclcpp::Time last_command_;
     rclcpp::Time last_output_;
@@ -74,7 +75,9 @@ public:
         right_thrust_pub_ = create_publisher<std_msgs::msg::Float64>(right_thrust_topic, 10);
 
         // Max is around 2353 N
-        max_thrust_ = declare_parameter<double>("max_thrust", 2353.0);
+        max_thrust_ = declare_parameter<double>("max_thrust", 2300.0);
+        // Asymmetric, seems min is -1000
+        min_thrust_ = declare_parameter<double>("min_thrust", -1000.0);
 
         sub_ = create_subscription<helm_msgs::msg::ThrustCommand>("thrust_command", 10, std::bind(&VrxThrusterNode::on_command, this, std::placeholders::_1));
 
