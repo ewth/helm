@@ -43,6 +43,11 @@ private:
         std_msgs::msg::Float64 l, r;
         l.data = std::clamp(left, -max_thrust_, max_thrust_);
         r.data = std::clamp(right, -max_thrust_, max_thrust_);
+        if (now() - last_output_ > timeout_)
+        {
+            std::cout << "L: " << l.data << "; R: " << r.data << std::endl;
+            last_output_ = now();
+        }
         left_thrust_pub_->publish(l);
         right_thrust_pub_->publish(r);
     }
@@ -50,6 +55,7 @@ private:
     double max_thrust_{};
     rclcpp::Duration timeout_{0, 0};
     rclcpp::Time last_command_;
+    rclcpp::Time last_output_;
     rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr left_thrust_pub_, right_thrust_pub_;
     rclcpp::Subscription<helm_msgs::msg::ThrustCommand>::SharedPtr sub_;
     rclcpp::TimerBase::SharedPtr watchdog_;
@@ -67,14 +73,14 @@ public:
         left_thrust_pub_ = create_publisher<std_msgs::msg::Float64>(left_thrust_topic, 10);
         right_thrust_pub_ = create_publisher<std_msgs::msg::Float64>(right_thrust_topic, 10);
 
-        // Arbitrary for now
-        // @todo: verify actual max thrust of WAMV
-        max_thrust_ = declare_parameter<double>("max_thrust", 1000.0);
+        // Max is around 2353 N
+        max_thrust_ = declare_parameter<double>("max_thrust", 2353.0);
 
         sub_ = create_subscription<helm_msgs::msg::ThrustCommand>("thrust_command", 10, std::bind(&VrxThrusterNode::on_command, this, std::placeholders::_1));
 
         timeout_ = rclcpp::Duration::from_seconds(declare_parameter<double>("command_timeout", 0.5));
         last_command_ = now();
+        last_output_ = now();
         watchdog_ = create_wall_timer(100ms, std::bind(&VrxThrusterNode::on_watchdog, this));
     };
 };
