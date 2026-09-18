@@ -21,6 +21,31 @@ using namespace std::chrono_literals;
 class VrxThrusterNode : public rclcpp::Node
 {
 
+public:
+    VrxThrusterNode() : Node("vrx_thruster_node")
+    {
+        // /wamv/thrusters/{left,right}/{pos,thrust}
+        // @todo: review pos usage
+        const auto left_thrust_topic = declare_parameter<std::string>("left_thrust_topic", "/wamv/thrusters/left/thrust");
+        const auto right_thrust_topic = declare_parameter<std::string>("right_thrust_topic", "/wamv/thrusters/right/thrust");
+
+        // QoS 10 is implicitly keep last
+        left_thrust_pub_ = create_publisher<std_msgs::msg::Float64>(left_thrust_topic, 10);
+        right_thrust_pub_ = create_publisher<std_msgs::msg::Float64>(right_thrust_topic, 10);
+
+        // Max is around 2353 N
+        max_thrust_ = declare_parameter<double>("max_thrust", 2300.0);
+        // Asymmetric, seems min is -1000
+        min_thrust_ = declare_parameter<double>("min_thrust", -1000.0);
+
+        sub_ = create_subscription<helm_msgs::msg::ThrustCommand>("thrust_command", 10, std::bind(&VrxThrusterNode::on_command, this, std::placeholders::_1));
+
+        timeout_ = rclcpp::Duration::from_seconds(declare_parameter<double>("command_timeout", 0.5));
+        last_command_ = now();
+        last_output_ = now();
+        watchdog_ = create_wall_timer(100ms, std::bind(&VrxThrusterNode::on_watchdog, this));
+    };
+
 private:
     void on_command(const helm_msgs::msg::ThrustCommand &msg)
     {
@@ -61,31 +86,6 @@ private:
     rclcpp::Subscription<helm_msgs::msg::ThrustCommand>::SharedPtr sub_;
     rclcpp::TimerBase::SharedPtr watchdog_;
     std::uint32_t watchdog_hit_{0};
-
-public:
-    VrxThrusterNode() : Node("vrx_thruster_node")
-    {
-        // /wamv/thrusters/{left,right}/{pos,thrust}
-        // @todo: review pos usage
-        const auto left_thrust_topic = declare_parameter<std::string>("left_thrust_topic", "/wamv/thrusters/left/thrust");
-        const auto right_thrust_topic = declare_parameter<std::string>("right_thrust_topic", "/wamv/thrusters/right/thrust");
-
-        // QoS 10 is implicitly keep last
-        left_thrust_pub_ = create_publisher<std_msgs::msg::Float64>(left_thrust_topic, 10);
-        right_thrust_pub_ = create_publisher<std_msgs::msg::Float64>(right_thrust_topic, 10);
-
-        // Max is around 2353 N
-        max_thrust_ = declare_parameter<double>("max_thrust", 2300.0);
-        // Asymmetric, seems min is -1000
-        min_thrust_ = declare_parameter<double>("min_thrust", -1000.0);
-
-        sub_ = create_subscription<helm_msgs::msg::ThrustCommand>("thrust_command", 10, std::bind(&VrxThrusterNode::on_command, this, std::placeholders::_1));
-
-        timeout_ = rclcpp::Duration::from_seconds(declare_parameter<double>("command_timeout", 0.5));
-        last_command_ = now();
-        last_output_ = now();
-        watchdog_ = create_wall_timer(100ms, std::bind(&VrxThrusterNode::on_watchdog, this));
-    };
 };
 
 int main(int argc, char **argv)
