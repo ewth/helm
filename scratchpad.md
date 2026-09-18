@@ -459,3 +459,21 @@ position_covariance_type: 0
 * GPS is published at about 19 Hz per `ros2 topic hz /wamv/sensors/gps/gps/fix`. More than enough.
 * Installing `ros-jazzy-tf2-tools`; adding to base image.
 * `ros2 run tf2_tools view_frames`. Quick squiz of the frames.
+* Found `/ws/vrx_ws/src/vrx_urdf/wamv_gazebo/urdf/components/wamv_imu.xacro`
+    * Interesting; looks like ENU. Thought NED was maritime convention, but doesn't really matter.
+
+```text
+/ws/vrx_ws/src/vrx_urdf/wamv_gazebo/urdf/components/wamv_imu.xacro:104:          <orientation_reference_frame>
+/ws/vrx_ws/src/vrx_urdf/wamv_gazebo/urdf/components/wamv_imu.xacro:105:            <localization>ENU</localization>
+/ws/vrx_ws/src/vrx_urdf/wamv_gazebo/urdf/components/wamv_imu.xacro:106:          </orientation_reference_frame>
+```
+
+* Mapping to compass heading: `heading = pi/2 - yaw_enu`
+* Controller needs boats position; heading and velocity in local Cartesian frame
+* Copying `ekf.yaml`, `navsat_transform.yaml` from `$(ros2 pkg prefix robot_localization)/share/robot_localization/params/`
+    * Few minor changes. Will likely need tweaking. Let's see what it gives.
+* Oddity with thrusters. Only one seems to be powered. Interesting.
+    * As an aside: seems WAMV thrust is in Newtons; napkin math max is around 2353.
+    * Seems to be a type conversion error occurred somewhere. Must've been something dodgy I passed it in the cli.
+    * Cold start, works.
+* Basic localisation functional.
