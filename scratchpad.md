@@ -477,3 +477,37 @@ position_covariance_type: 0
     * Seems to be a type conversion error occurred somewhere. Must've been something dodgy I passed it in the cli.
     * Cold start, works.
 * Basic localisation functional.
+* Putting that aside for a second.
+
+Control:
+
+* Basic PID to start with.
+    * Discrete, not simulating continuous here.
+* What does the controller want?
+
+Allocation:
+
+> Two controls and path-following control: It is standard procedure to define a 2-D workspace (along-track and cross-track errors) and minimize the cross-track error by means of an LOS path-following controller; see Sections 10.3–10.4 and 12.2.8–12.2.9. Hence, it is possible to follow a path by using only two controls (surge speed and yaw moment). For a conventional ship this is achieved by using a rudder and a propeller only.
+
+* Fossen: Thrust Configuration
+    * This is a truly fascinating read.
+    * `τ = T(α)f = T(α)Ku` (12.229)
+    * `T(α) = [t_1 , . . . , t_r]` (12.230)
+    * Assuming thrusters are fixed for now: `α = α0 = constant`; `T = T(α0)` (12.243)
+    * `τ = T(α)Ku = T(α)Ku` -> `Ku = τT^-1`
+
+So...
+
+* Making it a bit easier for coding: `u = tau x T^-1`.
+* Assuming fixed thrustybois:
+    * No sway force; thruster can't push sideways: `F_y = 0`.
+    * Surge force; entire thrust is along x: `F_x` = `u_i`.
+    * Yaw moment
+
+Alright that's another maths for today. Very interesting tbc, tbc.
+
+## References
+
+* Fossen, 2011, "Handbook of Marine Craft Hydrodynamics and Motion Control", somethingth edition, some publisher.
+* "Station-keeping control of an unmanned surface vehicle exposed to current and wind disturbances" (10.1016/j.oceaneng.2016.09.037)
+* [Fossen's Lecture Material for TTK4190](https://github.com/cybergalactic/FossenHandbook)
